@@ -18,12 +18,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/sign-up", "/check-email-token",
-                                "/email-login", "/login-by-email", "/search/study").permitAll()
+                        .requestMatchers(
+                                "/", "/login", "/sign-up", "/check-email-token",
+                                "/email-login", "/login-by-email", "/search/study",
+                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/profile/*").permitAll()
                         .anyRequest().authenticated()
                 );
 
         return http.build();
     }
+
 }
