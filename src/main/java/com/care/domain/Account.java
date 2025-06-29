@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 //DB 테이블과 매핑되는 JPA 엔티티
 @Entity
@@ -83,4 +84,7 @@ public class Account {
     //스터디 내용 변경 시 웹으로 알림받을지 여부
     private boolean studyUpdatedByWeb;
 
+    public void generateEmailCheckToken() {
+        this.emailCheckToken = UUID.randomUUID().toString();
+    }
 }
