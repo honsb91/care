@@ -14,4 +14,6 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
     boolean existsByEmail(@Email @NotBlank String email);
 
     boolean existsByNickname(@NotBlank @Length(min = 3, max = 20) @Pattern(regexp = "^[ㄱ-ㅎ가-힣a-z0-9_-]{3,20}$") String nickname);
+
+    Account findByEmail(String email);
 }
