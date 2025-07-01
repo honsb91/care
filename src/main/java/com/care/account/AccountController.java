@@ -21,10 +21,8 @@ public class AccountController {
 
     //회원가입 폼 검사
     private final SignUpFormValidator signUpFormValidator;
-    //DB에 회원정보 저장
-    private final AccountRepository accountRepository;
-    //이메일
-    private final JavaMailSender javaMailSender;
+    private final AccountService accountService;
+
 
     //↓ "" 객체에 대해 검사를 담당할 Validator를 등록하는 함수
     @InitBinder("signUpForm")
@@ -48,28 +46,11 @@ public class AccountController {
             return "account/sign-up";
         }
 
-        //회원정보를 "객체"로 만들어 DB에 저장하기
-        Account account = Account.builder()
-                .email(signUpForm.getEmail())
-                .nickname(signUpForm.getNickname())
-                .password(signUpForm.getPassword()) //TODO encoding 해야함.
-                .studyCreatedByWeb(true) //기본값은 false
-                .studyEnrollmentResultByWeb(true)
-                .studyUpdatedByWeb(true)
-                .build();
-
-        Account newAccount = accountRepository.save(account);
-
-        //이메일 인증메일 보내기
-        newAccount.generateEmailCheckToken(); //인증용 토큰생성
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(newAccount.getEmail());
-        mailMessage.setSubject("아이돌봄, 회원가입 인증");
-        mailMessage.setText("/check-email-token?token=" + newAccount.getEmailCheckToken() +
-                "&email=" + newAccount.getEmail());
-        javaMailSender.send(mailMessage);
+        accountService.processNewAccount(signUpForm);
 
         //TODO 회원가입 처리
         return "redirect:/";
     }
+
+
 }
