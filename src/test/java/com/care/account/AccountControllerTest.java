@@ -18,8 +18,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -35,6 +34,17 @@ class AccountControllerTest {
     @SuppressWarnings("removal")
     @MockBean
     JavaMailSender javaMailSender;
+
+    @DisplayName("인증 메일확인 - 입력값 오류")
+    @Test
+    void checkEmailToken_with_wrong_input() throws Exception{
+        mockMvc.perform(get("/check-email-token")
+                .param("token","atdmatmmkl")
+                .param("email","emam@email.com"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("error"))
+                .andExpect(view().name("account/checked-email"));
+    }
 
     @DisplayName("회원가입 화면보이는지 테스트")
     @Test
