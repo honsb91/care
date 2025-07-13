@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDateTime;
+
 //회원가입 폼을 보여주고 회원가입을 처리하는 controller
 @Controller
 //↓ "final"로 선언된 변수들을 자동으로 생성자에서 주입해주는 롬복 어노테이션(의존성 주입을 쉽게 해줌)
@@ -56,15 +58,24 @@ public class AccountController {
     @GetMapping("/check-email-token")
     public String checkEmailToken(String token, String email, Model model) {
         Account account = accountRepository.findByEmail(email);
+        String view = "account/checked-email";
+
         if (account == null) {
             model.addAttribute("error", "wrong.email");
-            return "account/checkedEmail";
+            return view;
         }
 
         if(!account.getEmailCheckToken().equals(token)){
             model.addAttribute("error", "wrong.token");
-            return "account/checkedEmail";
+            return view;
+
         }
+
+        account.setEmailVerified(true);
+        account.setJoinedAt(LocalDateTime.now());
+        model.addAttribute("numberOfUser", accountRepository.count());
+        model.addAttribute("nickname", account.getNickname());
+        return view;
     }
 
 }
