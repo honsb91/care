@@ -22,6 +22,7 @@ import java.util.UUID;
 //사용자(회원)정보를 담는 DB 테이블과 연결된 JPA 엔티티 클래스
 public class Account {
 
+
     //기본키(PK)
     @Id
     //ID 값을 자동으로 생성하게 설정
@@ -92,4 +93,10 @@ public class Account {
         this.emailVerified = true;
         this.joinedAt = LocalDateTime.now();
     }
+
+    public boolean isValidToken(String token){
+        return this.emailCheckToken.equals(token);
+    }
+
+
 }

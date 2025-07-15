@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,7 +46,8 @@ class AccountControllerTest {
                 .param("email","emam@email.com"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("error"))
-                .andExpect(view().name("account/checked-email"));
+                .andExpect(view().name("account/checked-email"))
+                .andExpect(unauthenticated());
     }
 
     @DisplayName("인증 메일확인 - 입력값 정상")
@@ -66,7 +69,8 @@ class AccountControllerTest {
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeExists("nickname"))
                 .andExpect(model().attributeExists("numberOfUser"))
-                .andExpect(view().name("account/checked-email"));
+                .andExpect(view().name("account/checked-email"))
+                .andExpect(authenticated().withUsername("asdfqwer"));
     }
 
     @DisplayName("회원가입 화면보이는지 테스트")
@@ -75,7 +79,8 @@ class AccountControllerTest {
         mockMvc.perform(get("/sign-up"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/sign-up"));
+                .andExpect(view().name("account/sign-up"))
+                .andExpect(unauthenticated());
     }
 
     @DisplayName("회원가입처리 - 입력값 오류")
@@ -87,7 +92,8 @@ class AccountControllerTest {
                 .param("password","12345")
                 .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("account/sign-up"));
+                .andExpect(view().name("account/sign-up"))
+                .andExpect(unauthenticated());
     }
 
     @DisplayName("회원가입처리 - 입력값 정상")
@@ -95,15 +101,16 @@ class AccountControllerTest {
     void signUpSubmit_with_correct_input() throws Exception {
         mockMvc.perform(post("/sign-up")
                         .param("nickname","honsb")
-                        .param("email","ok@naver.com")
-                        .param("password","12345678")
+                        .param("email","slwo567@naver.com")
+                        .param("password","10203044")
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/"));
+                .andExpect(view().name("redirect:/"))
+                .andExpect(authenticated().withUsername("honsb"));
 
-         Account account = accountRepository.findByEmail("ok@naver.com");
+         Account account = accountRepository.findByEmail("slwo567@naver.com");
          assertNotNull(account);
-        assertNotEquals(account.getPassword(), "12345678");
+        assertNotEquals(account.getPassword(), "10203044");
         assertNotNull(account.getEmailCheckToken());
         then(javaMailSender).should().send(any(SimpleMailMessage.class));
     }
